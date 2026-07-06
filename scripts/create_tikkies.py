@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""Create one Tikkie payment request per participant and inject the links into index.html.
+
+Usage:
+    set TIKKIE_API_KEY=...      (from developer.abnamro.com)
+    set TIKKIE_APP_TOKEN=...    (from Tikkie Business Portal > Settings > API)
+    set TIKKIE_SANDBOX=1        (optional: use sandbox environment)
+    python scripts/create_tikkies.py
+
+    python scripts/create_tikkies.py --create-sandbox-app
+        (sandbox only: creates a sandbox app token, no TIKKIE_APP_TOKEN needed)
+
+Idempotent: already-created links in tikkie_links.json are kept, only missing
+participants get a new payment request.
+"""
+import json
+import os
+import sys
+import urllib.request
+import urllib.error
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PARTICIPANTS_FILE = os.path.join(ROOT, "participants.json")
+LINKS_FILE = os.path.join(ROOT, "tikkie_links.json")
+INDEX_FILE = os.path.join(ROOT, "index.html")
+
+EXPIRY_DATE = "2026-07-31"  # past the 20 July deadline so late payers can still pay
+DATA_START = "// TIKKIE-DATA-START"
+DATA_END = "// TIKKIE-DATA-END"
+
+
+def base_url():
+    if os.environ.get("TIKKIE_SANDBOX"):
+        return "https://api-sandbox.abnamro.com/v2/tikkie"
+    return "https://api.abnamro.com/v2/tikkie"
+
+
+def api_call(method, path, body=None, app_token=None):
+    api_key = os.environ.get("TIKKIE_API_KEY")
+    if not api_key:
+        sys.exit("ERROR: set the TIKKIE_API_KEY environment variable first.")
+    req = urllib.request.Request(base_url() + path, method=method)
+    req.add_header("API-Key", api_key)
+    req.add_header("Content-Type", "application/json")
+    if app_token:
+        req.add_header("X-App-Token", app_token)
+    data = json.dumps(body).encode() if body is not None else None
+    try:
+        with urllib.request.urlopen(req, data=data, timeout=30) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode(errors="replace")
+        sys.exit(f"ERROR: {method} {path} -> HTTP {e.code}\n{detail}")
+
+
+def create_sandbox_app():
+    result = api_call("POST", "/sandboxapps")
+    print("Sandbox app token (set as TIKKIE_APP_TOKEN):")
+    print(result.get("appToken", result))
+
+
+def main():
+    if "--create-sandbox-app" in sys.argv:
+        create_sandbox_app()
+        return
+
+    app_token = os.environ.get("TIKKIE_APP_TOKEN")
+    if not app_token:
+        sys.exit("ERROR: set the TIKKIE_APP_TOKEN environment variable first.")
+
+    with open(PARTICIPANTS_FILE, encoding="utf-8") as f:
+        participants = json.load(f)
+
+    links = {}
+    if os.path.exists(LINKS_FILE):
+        with open(LINKS_FILE, encoding="utf-8") as f:
+            links = {e["fullName"]: e for e in json.load(f)}
+
+    for i, p in enumerate(participants):
+        name = p["fullName"]
+        pid = f"p{i + 1:02d}"
+        if name in links and links[name].get("url"):
+            print(f"skip   {name} (already has a tikkie)")
+            continue
+        # Description/reference use initials + team, never the person's name, so
+        # nothing personally identifying leaks to whoever opens the Tikkie link.
+        desc = f"FnF {p['teams'][0]} {p['initials']}"[:35]
+        body = {
+            "description": desc,
+            "amountInCents": p["amountCents"],
+            "expiryDate": EXPIRY_DATE,
+            "referenceId": "FNF2026-" + pid,
+        }
+        result = api_call("POST", "/paymentrequests", body, app_token)
+        links[name] = {
+            "id": pid,
+            "fullName": name,          # kept LOCAL only (tikkie_links.json is gitignored)
+            "firstName": p["firstName"],
+            "initials": p["initials"],
+            "amountCents": p["amountCents"],
+            "teams": p["teams"],
+            "note": p.get("note"),
+            "token": result["paymentRequestToken"],
+            "url": result["url"],
+        }
+        # Save after EACH creation so a crash mid-run is safely resumable
+        # (re-running skips people already recorded, never double-charging).
+        save_links(participants, links)
+        print(f"created {name}: {result['url']}")
+
+    ordered = [links[p["fullName"]] for p in participants]
+    save_links(participants, links)
+    print(f"\nwrote {LINKS_FILE}")
+
+    inject_into_index(ordered)
+    print(f"updated {INDEX_FILE} — commit and push to deploy.")
+
+
+def save_links(participants, links):
+    """Write tikkie_links.json in participant order, including only created ones."""
+    ordered = [links[p["fullName"]] for p in participants if p["fullName"] in links]
+    with open(LINKS_FILE, "w", encoding="utf-8") as f:
+        json.dump(ordered, f, indent=2, ensure_ascii=False)
+
+
+def ordered_teams(entries):
+    """Unique showteam names in first-appearance order."""
+    teams = []
+    for e in entries:
+        for t in e["teams"]:
+            if t not in teams:
+                teams.append(t)
+    return teams
+
+
+def inject_into_index(entries):
+    lines = [DATA_START + " (auto-generated by scripts/create_tikkies.py — do not edit by hand)"]
+    lines.append("const TEAMS = " + json.dumps(ordered_teams(entries), ensure_ascii=False) + ";")
+    # NOTE: only opaque id + initials go into the public page — never names.
+    lines.append("const PEOPLE = [")
+    for e in entries:
+        lines.append(
+            f'  {{ id: {json.dumps(e["id"], ensure_ascii=False)}, '
+            f'initials: {json.dumps(e["initials"], ensure_ascii=False)}, '
+            f'amountCents: {e["amountCents"]}, '
+            f'teams: {json.dumps(e["teams"], ensure_ascii=False)}, '
+            f'note: {json.dumps(e.get("note"), ensure_ascii=False)}, '
+            f'link: {json.dumps(e["url"], ensure_ascii=False)} }},'
+        )
+    lines.append("];")
+    lines.append(DATA_END)
+    block = "\n".join(lines)
+
+    with open(INDEX_FILE, encoding="utf-8") as f:
+        html = f.read()
+    start = html.index(DATA_START)
+    end = html.index(DATA_END) + len(DATA_END)
+    with open(INDEX_FILE, "w", encoding="utf-8") as f:
+        f.write(html[:start] + block + html[end:])
+
+
+if __name__ == "__main__":
+    main()

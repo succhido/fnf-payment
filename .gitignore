@@ -1,0 +1,7 @@
+tikkie_links.json
+payment_report.md
+.env
+manual_paid.json
+__pycache__/
+*.pyc
+participants.json

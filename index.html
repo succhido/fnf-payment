@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>SoSalsa! — Friends &amp; Family Day 2026</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #d30000;      /* sosalsa.nl theme primary */
+    --primary-dark: #a80000;
+    --accent: #E57373;       /* sosalsa.nl theme accent */
+    --secondary: #F5F4F4;    /* sosalsa.nl theme secondary */
+    --navbar: #2f2d2d;       /* sosalsa.nl navbar */
+    --ink: #2f2d2d;
+    --muted: #6d6a6a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Roboto, "Segoe UI", sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 40px;
+    background-color: var(--navbar);
+    background-image:
+      linear-gradient(180deg, rgba(30,28,28,.90) 0%, rgba(47,45,45,.82) 55%, rgba(30,28,28,.92) 100%),
+      url("veste.jpg");
+    background-size: cover;
+    background-position: center 65%;
+    background-repeat: no-repeat;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.45);
+    padding: 30px 26px 28px;
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+    border-top: 5px solid var(--primary);
+  }
+  .logo { width: min(230px, 62vw); margin-bottom: 14px; }
+  h1 {
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .subtitle { color: var(--muted); margin: 6px 0 24px; font-size: .98rem; }
+  label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1.05rem; text-align: left; }
+  select {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1.05rem;
+    font-family: inherit;
+    border: 2px solid #e2e0e0;
+    border-radius: 10px;
+    background: var(--secondary);
+    color: var(--ink);
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%23d30000' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    cursor: pointer;
+  }
+  select:focus { outline: none; border-color: var(--primary); }
+  .amount-box { display: none; margin-top: 22px; animation: fadeIn .25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .amount-label { color: var(--muted); font-size: .95rem; }
+  .amount { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin: 2px 0; }
+  .amount-note {
+    color: var(--ink);
+    font-size: .92rem;
+    margin: 8px 0 16px;
+    line-height: 1.45;
+    background: var(--secondary);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 12px;
+    text-align: left;
+    display: none;
+  }
+  .pay-btn {
+    display: inline-block;
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .pay-btn:hover { background: var(--primary-dark); }
+  .pay-btn:active { transform: scale(.98); }
+  .pay-btn[aria-disabled="true"] { background: #c9c6c6; cursor: not-allowed; }
+  .all-paid { display: none; font-size: 1.05rem; padding: 12px 0 4px; color: var(--ink); }
+  details.bank {
+    margin-top: 14px;
+    text-align: left;
+    font-size: .9rem;
+    border: 1px solid #e2e0e0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: #fdfcfc;
+  }
+  details.bank summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 500;
+    list-style-position: inside;
+  }
+  details.bank[open] summary { margin-bottom: 10px; color: var(--ink); }
+  .bank-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 0; }
+  .bank-row .k { color: var(--muted); white-space: nowrap; }
+  .bank-row .v { font-weight: 500; text-align: right; word-break: break-all; }
+  .copy-btn {
+    border: 1px solid #e2e0e0;
+    background: var(--secondary);
+    border-radius: 6px;
+    font: inherit;
+    font-size: .78rem;
+    padding: 2px 8px;
+    cursor: pointer;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .copy-btn:active { background: #e8e6e6; }
+  .bank-note { color: var(--muted); font-size: .8rem; margin-top: 8px; line-height: 1.45; }
+  .info {
+    max-width: 440px;
+    width: 100%;
+    margin-top: 22px;
+    font-size: .92rem;
+    color: rgba(255,255,255,.92);
+    line-height: 1.6;
+    background: rgba(30,28,28,.72);
+    border-radius: 12px;
+    padding: 18px 20px;
+    backdrop-filter: blur(3px);
+  }
+  .info strong { color: #fff; }
+  .info .deadline { color: #ff8a80; font-weight: 700; }
+  .info a { color: #ff8a80; font-weight: 700; text-decoration: none; }
+  footer {
+    margin-top: 26px;
+    color: rgba(255,255,255,.55);
+    font-size: .74rem;
+    text-align: center;
+    line-height: 1.6;
+  }
+  footer a { color: rgba(255,255,255,.55); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img class="logo" src="sosalsa_logo.png" alt="SoSalsa!">
+    <h1>Friends &amp; Family Day 2026</h1>
+    <p class="subtitle">Showteam participation payment · Theater de Veste</p>
+
+    <label for="team">1 · Your showteam</label>
+    <select id="team">
+      <option value="" selected disabled>Select your showteam…</option>
+    </select>
+
+    <label for="who" id="whoLabel" style="margin-top:18px;display:none;">2 · Your initials</label>
+    <select id="who" style="display:none;">
+      <option value="" selected disabled>Select your initials…</option>
+    </select>
+
+    <div class="all-paid" id="allPaid">🎉 Everyone has paid — thank you!</div>
+
+    <div class="amount-box" id="amountBox">
+      <div class="amount-label">Your contribution</div>
+      <div class="amount" id="amount"></div>
+      <div class="amount-note" id="amountNote"></div>
+      <a class="pay-btn" id="payBtn" href="#" target="_blank" rel="noopener">Pay with Tikkie 💃</a>
+
+      <details class="bank">
+        <summary>No Tikkie or no EU bank account? Pay by bank transfer</summary>
+        <div class="bank-row">
+          <span class="k">Account holder</span>
+          <span class="v">SoSalsa</span>
+        </div>
+        <div class="bank-row">
+          <span class="k">IBAN</span>
+          <span class="v">NL94 ABNA 0414 8534 15</span>
+          <button class="copy-btn" data-copy="NL94ABNA0414853415">Copy</button>
+        </div>
+        <div class="bank-row">
+          <span class="k">BIC <small>(from outside EU)</small></span>
+          <span class="v">ABNANL2A</span>
+        </div>
+        <div class="bank-row">
+          <span class="k">Description</span>
+          <span class="v" id="bankDesc"></span>
+          <button class="copy-btn" id="copyDesc">Copy</button>
+        </div>
+        <div class="bank-note">Transfer the exact amount shown above and use this exact description, otherwise we can't match your payment. Bank transfers are ticked off by hand, so your name may stay in the list a little longer after paying.</div>
+      </details>
+    </div>
+  </div>
+
+  <div class="info">
+    <strong>Good to know:</strong><br>
+    • Pick your showteam, then your initials — the right amount appears automatically.<br>
+    • €35 for one showteam, €50 if you dance in more than one.<br>
+    • <strong>In more than one showteam?</strong> Your initials appear under each of them — pick any one, you only pay once.<br>
+    • Deadline: <span class="deadline">Sunday 20 July 2026</span>.<br>
+    • Already paid? Your initials disappear from the list.<br>
+    • Trainers don't pay. Can't find your initials? Then you most likely don't have to pay.<br>
+    • No Tikkie or no EU bank account? Select your initials and open the bank transfer option.<br>
+    • Questions or something wrong? WhatsApp the treasurer ASAP: <a href="https://wa.me/31624130255">+31 6 24130255</a>.
+  </div>
+
+  <footer>
+    SoSalsa! · Delft<br>
+    This page lists only the initials of showteam participants, for collecting the participation fee.<br>
+    It is removed after the collection ends. Want your name removed sooner? <a href="https://wa.me/31624130255">Message the treasurer</a>.<br>
+    Photo: Theater de Veste — <a href="https://commons.wikimedia.org/wiki/File:Theater_de_Veste_-_Delft.jpg" rel="noopener">Michiel1972, CC BY-SA 3.0</a>
+  </footer>
+
+<script>
+// TIKKIE-DATA-START (auto-generated by scripts/create_tikkies.py — do not edit by hand)
+const TEAMS = ["Bachata", "Salsa LA", "Rueda Intermediate", "Rueda Open"];
+// Only opaque ids + initials here — no names are published on this page.
+const PEOPLE = [
+  { id: "p01", initials: "IH", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p02", initials: "LdG", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p03", initials: "LB", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p04", initials: "GL", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p05", initials: "C", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p06", initials: "L", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p07", initials: "SP", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p08", initials: "MdB", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p09", initials: "CM", amountCents: 3500, teams: ["Bachata"], note: null, link: null },
+  { id: "p10", initials: "AK", amountCents: 3500, teams: ["Salsa LA"], note: null, link: null },
+  { id: "p11", initials: "DZ", amountCents: 3500, teams: ["Salsa LA"], note: null, link: null },
+  { id: "p12", initials: "MZ", amountCents: 3500, teams: ["Salsa LA"], note: null, link: null },
+  { id: "p13", initials: "DS", amountCents: 3500, teams: ["Salsa LA"], note: null, link: null },
+  { id: "p14", initials: "NG", amountCents: 3500, teams: ["Salsa LA"], note: null, link: null },
+  { id: "p15", initials: "SJ", amountCents: 5000, teams: ["Salsa LA", "Rueda Open"], note: "You're in two showteams (Salsa LA & Rueda Open), so the fee is €50. You only pay once — pick either team above.", link: null },
+  { id: "p16", initials: "IH", amountCents: 3500, teams: ["Salsa LA", "Rueda Open"], note: "You're in two showteams (Salsa LA & Rueda Open), but you pay the single €35 fee — an exception because you filled in for someone else. You only pay once — pick either team above.", link: null },
+  { id: "p17", initials: "DRGA", amountCents: 5000, teams: ["Rueda Intermediate", "Rueda Open"], note: "You're in two showteams (Rueda Intermediate & Rueda Open), so the fee is €50. You only pay once — pick either team above.", link: null },
+  { id: "p18", initials: "GVM", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p19", initials: "JF", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p20", initials: "RA", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p21", initials: "EF", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p22", initials: "SM", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p23", initials: "FvdG", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p24", initials: "MvS", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p25", initials: "GvM", amountCents: 3500, teams: ["Rueda Intermediate"], note: null, link: null },
+  { id: "p26", initials: "LS", amountCents: 3500, teams: ["Rueda Open"], note: null, link: null },
+  { id: "p27", initials: "BD", amountCents: 3500, teams: ["Rueda Open"], note: null, link: null },
+  { id: "p28", initials: "GF", amountCents: 3500, teams: ["Rueda Open"], note: null, link: null },
+  { id: "p29", initials: "AdW", amountCents: 3500, teams: ["Rueda Open"], note: null, link: null },
+  { id: "p30", initials: "YSA", amountCents: 3500, teams: ["Rueda Open"], note: null, link: null },
+  { id: "p31", initials: "AGU", amountCents: 3500, teams: ["Rueda Open"], note: null, link: null },
+];
+// TIKKIE-DATA-END
+
+// PAID-DATA-START (auto-updated daily by scripts/check_payments.py — do not edit by hand)
+const PAID = [];
+// PAID-DATA-END
+
+const teamSel = document.getElementById("team");
+const sel = document.getElementById("who");
+const whoLabel = document.getElementById("whoLabel");
+const box = document.getElementById("amountBox");
+const amountEl = document.getElementById("amount");
+const noteEl = document.getElementById("amountNote");
+const btn = document.getElementById("payBtn");
+const bankDesc = document.getElementById("bankDesc");
+const copyDesc = document.getElementById("copyDesc");
+
+const isOpen = p => !PAID.includes(p.id);
+
+// Build the showteam dropdown, hiding teams whose members have all paid.
+let anyOpen = false;
+TEAMS.forEach(team => {
+  const openInTeam = PEOPLE.filter(p => p.teams.includes(team) && isOpen(p));
+  if (openInTeam.length === 0) return;
+  anyOpen = true;
+  const o = document.createElement("option");
+  o.value = team;
+  o.textContent = team;
+  teamSel.appendChild(o);
+});
+if (!anyOpen) {
+  teamSel.style.display = "none";
+  document.querySelector("label[for=team]").style.display = "none";
+  document.getElementById("allPaid").style.display = "block";
+}
+
+// currently listed people for the selected team (index matches the initials dropdown)
+let currentList = [];
+
+teamSel.addEventListener("change", () => {
+  const team = teamSel.value;
+  currentList = PEOPLE
+    .filter(p => p.teams.includes(team) && isOpen(p))
+    .sort((a, b) => a.initials.localeCompare(b.initials));
+  // reset + repopulate the initials dropdown
+  sel.innerHTML = '<option value="" selected disabled>Select your initials…</option>';
+  currentList.forEach((p, i) => {
+    const o = document.createElement("option");
+    o.value = i;
+    o.textContent = p.initials;
+    sel.appendChild(o);
+  });
+  whoLabel.style.display = "block";
+  sel.style.display = "block";
+  box.style.display = "none";      // hide amount until initials chosen
+  sel.selectedIndex = 0;
+});
+
+sel.addEventListener("change", () => {
+  const p = currentList[sel.value];
+  if (!p) return;
+  amountEl.textContent = "€" + (p.amountCents / 100).toFixed(2).replace(".00", "");
+  // Bank reference uses team + initials (not a name) so the treasurer can match
+  // the incoming transfer without any name being shown on this page.
+  const ref = "FnF " + teamSel.value + " " + p.initials;
+  bankDesc.textContent = ref;
+  copyDesc.dataset.copy = ref;
+  if (p.note) {
+    noteEl.textContent = p.note;
+    noteEl.style.display = "block";
+  } else {
+    noteEl.style.display = "none";
+  }
+  if (p.link) {
+    btn.href = p.link;
+    btn.textContent = "Pay with Tikkie 💃";
+    btn.removeAttribute("aria-disabled");
+  } else {
+    btn.href = "#";
+    btn.textContent = "Payment link coming soon";
+    btn.setAttribute("aria-disabled", "true");
+  }
+  box.style.display = "block";
+});
+
+btn.addEventListener("click", (e) => {
+  if (btn.getAttribute("aria-disabled") === "true") e.preventDefault();
+});
+
+document.querySelectorAll(".copy-btn").forEach(b => {
+  b.addEventListener("click", () => {
+    navigator.clipboard.writeText(b.dataset.copy || "").then(() => {
+      const old = b.textContent;
+      b.textContent = "Copied!";
+      setTimeout(() => { b.textContent = old; }, 1200);
+    });
+  });
+});
+</script>
+</body>
+</html>
